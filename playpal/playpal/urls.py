@@ -15,8 +15,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+# imports Django REST framework that makes URLs for the API
+from rest_framework.routers import DefaultRouter
+# Imports the VenueView so the router knows where to send the API requests
+from venues.views import VenueView
+
+# Creates multiple API end points so we do have to create lots of unique URL patterns
+router = DefaultRouter()
+# This creates the details, unique etc - no need to add into the venues
+router.register(r'venues', VenueView)
 
 urlpatterns = [
+    # Directs through to the admin portal.
     path('admin/', admin.site.urls),
+    # this is for the api
+    path('api/', include(router.urls)),
 ]
