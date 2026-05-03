@@ -7,7 +7,7 @@ from django.conf import settings
 MONTH_CHOICES = [(i, f"{i:02d}") for i in range(1, 13)]
 
 
-class CustomUser(AbstractUser):
+class CustomUsers(AbstractUser):
     # Matches the Supabase user ID so Django can link requests back to the right account.
     supabase_uid = models.CharField(max_length=255, unique=True)
 
@@ -21,7 +21,7 @@ class CustomUser(AbstractUser):
     password = models.CharField(max_length=128, blank=True)
 
     # App-level admin flag.
-    is_supersuper = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('!'):
