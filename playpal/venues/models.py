@@ -41,3 +41,19 @@ class Venue(models.Model):
     
     def __str__(self):
         return f"{self.sub_category} - {self.suburb}"
+    
+
+class Ratings(models.Model):
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="ratings")
+    activity_eatery_id = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="ratings")
+    # Stores whether the rating is good or bad.
+    rating_type = models.BooleanField()
+
+    class Meta:
+        # Prevent the same person from rating the same place more than once.
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user_id', 'activity_eatery_id'],
+                name='unique_user_activity_eatery_rating_id',
+            ),
+        ]
