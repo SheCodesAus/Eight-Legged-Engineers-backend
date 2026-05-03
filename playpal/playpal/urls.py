@@ -20,11 +20,13 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 # Imports the VenueView so the router knows where to send the API requests
 from venues.views import VenueView
+from kids.views import KidView
 
 # Creates multiple API end points so we do have to create lots of unique URL patterns
 router = DefaultRouter()
 # This creates the details, unique etc - no need to add into the venues
 router.register(r'venues', VenueView)
+router.register(r'kids', KidView)
 
 urlpatterns = [
     # Directs through to the admin portal.

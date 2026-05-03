@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django_filters',
     'users',
     'venues',
+    'kids',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
