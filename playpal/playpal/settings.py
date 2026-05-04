@@ -2,13 +2,18 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+# .env should live at the repo root, alongside manage.py.
+# In production, inject environment variables directly — no .env file is needed.
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent.parent / '.env')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-2nz80=vs(saz-od=rqwe(8fat5_zue%zr5ee*pu@mgv0yflk5*'
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set. Add it to your .env file.")
 
-DEBUG = True
+# Defaults to False — set DEBUG=True in .env for local development only.
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -81,7 +86,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Supabase
 SUPABASE_JWT_SECRET = os.environ.get('SUPABASE_JWT_SECRET')
+if not SUPABASE_JWT_SECRET:
+    raise ValueError("SUPABASE_JWT_SECRET environment variable is not set. Add it to your .env file.")
+
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
+if not SUPABASE_URL:
+    raise ValueError("SUPABASE_URL environment variable is not set. Add it to your .env file.")
 
 # Django REST Framework — use Supabase JWT auth by default
 REST_FRAMEWORK = {
