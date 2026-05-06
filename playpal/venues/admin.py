@@ -6,7 +6,7 @@ from .models import Venue
 
 @admin.register(Venue)
 class VenueAdmin(admin.ModelAdmin):
-    list_display = ('main_category','sub_category','address', 'suburb', 'opening_times','age_range', 'cost', 'kids_eat_free', 'indoor_outdoor', 'wheelchair_friendly', 'latitude', 'longitude', 'image_url', 'verify_before_launch', 'kids_eat_free')
-    list_filter = ('main_category', 'sub_category', 'verify_before_launch')
-    search_fields = ('address', 'suburb', 'sub_category')
-    list_editable = ('verify_before_launch',)
+    list_display = ('name', 'sub_category', 'suburb', 'main_category', 'is_published', 'is_archived', 'kids_eat_free')
+    list_filter = ('main_category', 'sub_category', 'is_published', 'is_archived', 'indoor_outdoor')
+    search_fields = ('name', 'address', 'suburb', 'sub_category')
+    list_editable = ('is_published', 'is_archived')
