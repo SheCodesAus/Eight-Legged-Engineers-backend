@@ -18,13 +18,20 @@ class Command(BaseCommand):
             
             for row in reader:
                 try:
+                    # Helper to convert string to int or None
+                    def to_int(value):
+                        value = (value or '').strip()
+                        return int(value) if value else None
+                    
                     Venue.objects.create(
                         main_category=row['Main Category'],
                         sub_category=row['Sub Category'],
+                        name=row.get('Name', '').strip(),
                         address=row['Address'],
                         suburb=row['Suburb'],
                         opening_times=row['Opening Times'],
-                        age_range=row['Age Range'],
+                        min_age=to_int(row.get('Min Age')),
+                        max_age=to_int(row.get('Max Age')),
                         cost=row['Cost'],
                         kids_eat_free=row['Kids Eat Free'],
                         indoor_outdoor=row['Indoor/Outdoor'],
@@ -32,7 +39,9 @@ class Command(BaseCommand):
                         latitude=float(row['Latitude']),
                         longitude=float(row['Longitude']),
                         image_url=row['Image URL'],
-                        verify_before_launch=(row['Verify Before Launch'].strip().lower() == 'yes'),
+                        is_published=(row['is_published'].strip().lower() == 'yes'),
+                        is_archived=(row.get('is_archived', '').strip().lower() == 'yes'),
+                        ratings_id=to_int(row.get('ratings_id')),
                     )
                     created_count += 1
                 except Exception as e:
