@@ -127,6 +127,12 @@ SUPABASE_JWT_SECRET = os.environ.get('SUPABASE_JWT_SECRET')
 if not SUPABASE_JWT_SECRET:
     raise ValueError("SUPABASE_JWT_SECRET environment variable is not set. Add it to your .env file.")
 
+SUPABASE_JWT_PUBLIC_KEY = os.environ.get('SUPABASE_JWT_PUBLIC_KEY')
+if not SUPABASE_JWT_PUBLIC_KEY:
+    raise ValueError('SUPABASE_JWT_PUBLIC_KEY is not set.')
+
+SUPABASE_JWT_PUBLIC_KEY = SUPABASE_JWT_PUBLIC_KEY.replace('\\n', '\n')
+
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 if not SUPABASE_URL:
     raise ValueError("SUPABASE_URL environment variable is not set. Add it to your .env file.")
@@ -140,6 +146,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
+
+
 
 # CORS - allow frontend to call this API
 CORS_ALLOW_ALL_ORIGINS = True
