@@ -14,7 +14,7 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from .models import CustomUser, Kids
-from .serializers import CustomUserSerializer, KidsSerializer
+from .serializers import CustomUserSerializer, KidsSerializer, CustomUserDetailSerializer
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -25,6 +25,12 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     """
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]  # no unauthenticated reads
+
+    def get_serializer_class(self):
+        # Use a detailed serializer for the `me`, `retrieve`, and `list` actions
+        if self.action in ('me', 'retrieve', 'list'):
+            return CustomUserDetailSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
         # Regular users only see themselves; admins see all
