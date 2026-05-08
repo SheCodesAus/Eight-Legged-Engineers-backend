@@ -19,12 +19,12 @@ class SupabaseAuthentication(BaseAuthentication):
             return None  # No token — let permission classes decide if this is ok
 
         token = auth_header.split(' ')[1]
-
+        pem_key = settings.SUPABASE_JWT_PUBLIC_KEY.replace('\\n', '\n')
         try:
             payload = jwt.decode(
                 token,
-                settings.SUPABASE_JWT_SECRET,
-                algorithms=['HS256'],
+                pem_key,
+                algorithms=['ES256'],
                 audience='authenticated',
             )
         except jwt.ExpiredSignatureError:
