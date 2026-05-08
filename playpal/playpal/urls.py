@@ -20,6 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     # Directs through to the admin portal.
     path('admin/', admin.site.urls),
-    # this is for the api
+    # API endpoints
+    path('api/', include('users.urls')),
     path('api/', include('venues.urls')),
 ]
