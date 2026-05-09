@@ -4,7 +4,9 @@ from django.urls import path, include
 urlpatterns = [
     # Directs through to the admin portal.
     path('admin/', admin.site.urls),
-    # venues endpoints (defined in venues/urls.py)
+    # API endpoints
+    path('api/', include('users.urls')),
+    # venues endpoints (defined in venues/urls.py):q
     path('api/', include('venues.urls')),
     # suburbs autocomplete API (defined in suburbs/urls.py)
     path('api/suburbs/', include('suburbs.urls')),
