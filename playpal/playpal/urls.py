@@ -6,7 +6,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/', include('users.urls')),
-    # venues endpoints (defined in venues/urls.py)
+    # venues endpoints (defined in venues/urls.py):q
     path('api/', include('venues.urls')),
     # suburbs autocomplete API (defined in suburbs/urls.py)
     path('api/suburbs/', include('suburbs.urls')),
