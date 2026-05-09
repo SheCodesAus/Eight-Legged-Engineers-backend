@@ -43,6 +43,7 @@ class VenueDetail(APIView):
     # Handles a single venue by its ID.
     # GET /api/venues/<id>/ Get one venues details
     # PATCH /api/venues/<id>/ Update some fields on the venue
+    # DELETE /api/venues/<id>/ Soft delete (archive)
     
     def get(self, request, pk):
         # pk = primary key (the venue's ID)
@@ -68,4 +69,15 @@ class VenueDetail(APIView):
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # soft delete - ovewrites hard delete to archive.
+
+    def delete(self, request, pk):
+        venue = get_object_or_404(Venue, pk=pk)
+        venue.is_archived = True
+        venue.save()
+        return Response(
+            {'message': 'Venue archived successfully'},
+            status=status.HTTP_204_NO_CONTENT
         )
