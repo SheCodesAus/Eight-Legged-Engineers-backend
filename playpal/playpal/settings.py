@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_filters',
     'users',
     'venues',
+    'suburbs',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
