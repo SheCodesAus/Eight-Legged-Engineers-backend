@@ -1,4 +1,4 @@
-from rest_framework import status, filters
+from rest_framework import request, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -15,6 +15,30 @@ class VenueList(APIView):
     def get(self, request):
         # Get all venues that haven't been archived.
         venues = Venue.objects.filter(is_archived=False)
+
+        # KEY FOR FRONTEND
+        
+        # Filter by main category (set by which tab the user clicked)
+        main_category = request.GET.get('main_category', '')
+        if main_category:
+            venues = venues.filter(main_category=main_category)
+
+        # Filter by suburb (set by the autocomplete in "where")
+        suburb = request.GET.get('suburb', '')
+        if suburb:
+            venues = venues.filter(suburb__iexact=suburb)
+
+        # Filter by indoor/outdoor (the "What?" buttons)
+        indoor_outdoor = request.GET.get('indoor_outdoor', '')
+        if indoor_outdoor:
+         venues = venues.filter(indoor_outdoor__iexact=indoor_outdoor)
+
+         # Filter by age (the "Who" field — kid's age)
+        age = request.GET.get('age', '')
+        if age:
+        # min_age <= age <= max_age
+         venues = venues.filter(min_age__lte=age, max_age__gte=age)
+        
         # Serializer turns the venue objects into JSON the frontend can use
         serializer = VenueSerializer(venues, many=True)
         return Response(serializer.data)
@@ -43,7 +67,6 @@ class VenueDetail(APIView):
     # Handles a single venue by its ID.
     # GET /api/venues/<id>/ Get one venues details
     # PATCH /api/venues/<id>/ Update some fields on the venue
-    # DELETE /api/venues/<id>/ Soft delete (archive)
     
     def get(self, request, pk):
         # pk = primary key (the venue's ID)
@@ -69,15 +92,4 @@ class VenueDetail(APIView):
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # soft delete - ovewrites hard delete to archive.
-
-    def delete(self, request, pk):
-        venue = get_object_or_404(Venue, pk=pk)
-        venue.is_archived = True
-        venue.save()
-        return Response(
-            {'message': 'Venue archived successfully'},
-            status=status.HTTP_204_NO_CONTENT
         )
