@@ -1,11 +1,12 @@
 import json
 import hmac
-import hashlib
+from urllib import request as urllib_request
+from urllib import error as urllib_error
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 
 from django.views.decorators.csrf import csrf_exempt
@@ -130,3 +131,56 @@ class SupabaseWebhookView(APIView):
         supabase_uid = old_record.get('id')
         if supabase_uid:
             CustomUser.objects.filter(supabase_uid=supabase_uid).delete()
+
+
+class LogoutView(APIView):
+    """
+    POST /api/auth/logout/
+    Logs out the current authenticated user.
+
+    In this stateless JWT setup, logout is primarily a client action
+    (discarding local tokens). If Supabase settings are available,
+    this endpoint also forwards the logout request to Supabase.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        auth_header = request.headers.get('Authorization', '')
+        supabase_url = getattr(settings, 'SUPABASE_URL', '')
+        supabase_anon_key = getattr(settings, 'SUPABASE_ANON_KEY', '')
+
+        # Best-effort Supabase session invalidation when configuration exists.
+        if auth_header.startswith('Bearer ') and supabase_url and supabase_anon_key:
+            req = urllib_request.Request(
+                f"{supabase_url}/auth/v1/logout",
+                method='POST',
+                headers={
+                    'Authorization': auth_header,
+                    'apikey': supabase_anon_key,
+                    'Content-Type': 'application/json',
+                },
+                data=b'{}',
+            )
+
+            try:
+                urllib_request.urlopen(req, timeout=10)
+            except urllib_error.HTTPError as exc:
+                body = exc.read().decode('utf-8', errors='ignore')
+                return Response(
+                    {
+                        'detail': 'Supabase logout failed.',
+                        'supabase_status': exc.code,
+                        'supabase_response': body,
+                    },
+                    status=status.HTTP_502_BAD_GATEWAY,
+                )
+            except urllib_error.URLError:
+                return Response(
+                    {'detail': 'Unable to contact Supabase logout endpoint.'},
+                    status=status.HTTP_502_BAD_GATEWAY,
+                )
+
+        return Response(
+            {'detail': 'Logged out. Clear client-side tokens to complete logout.'},
+            status=status.HTTP_200_OK,
+        )
