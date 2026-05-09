@@ -1,3 +1,15 @@
+"""
+Running this python script helps you to find the SUPABASE_JWT_PUBLIC_KEY environment to be placed in the .env file
+
+To run this file type in the following terminal command when you are in the root level.
+python helper.py
+
+Ensure that the dependencies below such as cryptography are listed in the requirements.txt.
+Install them by running this command.
+pip install -r requirements.txt
+"""
+
+
 import json
 import os
 from pathlib import Path
