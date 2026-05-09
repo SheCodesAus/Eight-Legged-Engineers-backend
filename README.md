@@ -127,6 +127,15 @@ Provide Guest users ability to post sticky notes to a live event board. Once pos
 > [!NOTE]  
 > What languages and frameworks will you be using? What kind of database will you be using? How will you deploy the website? Example Below.
 
+Django==5.1
+djangorestframework==3.15.2
++ django-cors-headers==4.5.0
++ dj-database-url==2.2.0
++ gunicorn==23.0.0
++ psycopg2-binary==2.9.10
++ python-dotenv==1.0.1
++ whitenoise==6.7.0
+
 ### Back-End
 
 - Django / DRF API
