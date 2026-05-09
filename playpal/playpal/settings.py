@@ -143,4 +143,3 @@ REST_FRAMEWORK = {
 
 # CORS - allow frontend to call this API
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
