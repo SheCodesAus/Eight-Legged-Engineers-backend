@@ -6,3 +6,11 @@ PyJWT==2.9.0
 python-dotenv==1.0.1
 django-filter==24.3
 cryptography==45.0.7
+
+#heroku dependencies
+django-cors-headers==4.5.0
+dj-database-url==2.2.0
+gunicorn==23.0.0
+psycopg2-binary==2.9.10
+python-dotenv==1.0.1
+whitenoise==6.7.0
