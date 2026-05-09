@@ -130,6 +130,8 @@ Provide Guest users ability to post sticky notes to a live event board. Once pos
 ### Back-End
 
 - Django / DRF API
+- Please import the venues data using `python manage.py import_venues data/NSW_Kids_Activities_Eateries.csv`
+- Please import the suburbs data using `python manage.py import_suburbs data/suburbs.csv`
 - Python
 
 ### Front-End
