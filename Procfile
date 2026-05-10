@@ -1,2 +1,2 @@
-web: gunicorn playpal.wsgi --log-file -
+web: gunicorn --chdir playpal playpal.wsgi --log-file -
 release: python playpal/manage.py migrate
