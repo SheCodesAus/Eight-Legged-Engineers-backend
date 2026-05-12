@@ -14,7 +14,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username', 'supabase_uid', 'kids']
+        fields = ['id', 'email', 'username', 'supabase_uid', 'is_staff', 'is_superuser','kids']
         read_only_fields = ['supabase_uid']
 
 
@@ -31,8 +31,8 @@ class CustomUserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username', 'supabase_uid', 'kids']
-        read_only_fields = ['supabase_uid']
+        fields = ['id', 'email', 'username', 'supabase_uid', 'is_staff', 'is_superuser', 'kids']
+        read_only_fields = ['supabase_uid', 'is_staff', 'is_superuser']
 
     def get_kids(self, obj):
         qs = Kids.objects.filter(user=obj)
