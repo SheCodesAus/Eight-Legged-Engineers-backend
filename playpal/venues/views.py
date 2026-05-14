@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from .models import Venue
-from .serializers import VenueSerializer, VenueDetailSerializer
+from .models import Venue, Rating
+from .serializers import VenueSerializer, VenueDetailSerializer, RatingSerializer
 
 class VenueList(APIView):
     # Handles the list of all venues.
@@ -93,3 +93,30 @@ class VenueDetail(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+class RatingList(APIView):
+    # GET /api/venues/<venue_pk>/ratings/ — list all ratings for a venue
+    # POST /api/venues/<venue_pk>/ratings/ — create a rating for a venue
+
+    def get(self, request, venue_pk):
+        venue = get_object_or_404(Venue, pk=venue_pk)
+        ratings = Rating.objects.filter(venue=venue, is_archived=False)
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, venue_pk):
+        venue = get_object_or_404(Venue, pk=venue_pk)
+        serializer = RatingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, venue=venue)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RatingDetail(APIView):
+    # GET /api/venues/<venue_pk>/ratings/<pk>/ — get a single rating
+
+    def get(self, request, venue_pk, pk):
+        rating = get_object_or_404(Rating, pk=pk, venue=venue_pk, is_archived=False)
+        serializer = RatingSerializer(rating)
+        return Response(serializer.data)

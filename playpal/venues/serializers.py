@@ -6,6 +6,7 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = '__all__'
+        read_only_fields = ['user', 'venue', 'created_at', 'updated_at']
 
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:

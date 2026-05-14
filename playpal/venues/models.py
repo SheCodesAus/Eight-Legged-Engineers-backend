@@ -45,6 +45,12 @@ class Venue(models.Model):
             models.Index(fields=['is_published']),
         ]
     
+    # when a venue is soft deleted, the corresponding ratings are also soft deleted.
+    def save(self, *args, **kwargs):
+        if self.is_archived:
+            self.ratings.update(is_archived=True)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name or f"{self.sub_category} - {self.suburb}"
 
