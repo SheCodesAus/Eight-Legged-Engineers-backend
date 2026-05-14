@@ -47,3 +47,29 @@ class Venue(models.Model):
     
     def __str__(self):
         return self.name or f"{self.sub_category} - {self.suburb}"
+
+
+class Rating(models.Model):
+    RATING_CHOICES = [
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ]
+
+    rating_type = models.CharField(max_length=3, choices=RATING_CHOICES)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='ratings'
+    )
+    venue = models.ForeignKey(
+        Venue,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='ratings'
+    )
+    is_archived = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user} rated {self.venue} - {self.rating_type}"
