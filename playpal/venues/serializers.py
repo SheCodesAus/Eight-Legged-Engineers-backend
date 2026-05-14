@@ -1,13 +1,26 @@
 from rest_framework import serializers
-from .models import Venue
+from .models import Venue, Rating
+
+class RatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rating
+        fields = '__all__'
 
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = '__all__'
 
+# nested serializer to include ratings in a single venue
 class VenueDetailSerializer(VenueSerializer):
-    
+
+    #  serialize all the records, the end user can only read the end point.
+    ratings = RatingSerializer(many=True, read_only=True)
+
+    class Meta(VenueSerializer.Meta):
+        fields = '__all__'
+        
     def update(self, instance, validated_data):
         instance.main_category = validated_data.get('main_category', instance.main_category)
         instance.sub_category = validated_data.get('sub_category', instance.sub_category)
@@ -27,3 +40,4 @@ class VenueDetailSerializer(VenueSerializer):
         instance.ratings_id = validated_data.get('ratings_id', instance.ratings_id)
         instance.save()
         return instance
+
