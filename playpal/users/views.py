@@ -34,8 +34,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        # Regular users only see themselves; admins see all
-        if self.request.user.is_staff:
+        # Regular users only see themselves. admins login to admin panel. superuser can see all and bypass permission checks.
+        if self.request.user.is_staff or self.request.user.is_superuser:
             return CustomUser.objects.prefetch_related('kids').all()
         return CustomUser.objects.prefetch_related('kids').filter(pk=self.request.user.pk)
 
