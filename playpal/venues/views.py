@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from .models import Venue, Rating
 from .serializers import VenueSerializer, VenueDetailSerializer, RatingSerializer
+from suburbs.models import Suburb
 
 class VenueList(APIView):
     # Handles the list of all venues.
@@ -31,15 +32,57 @@ class VenueList(APIView):
         # Filter by indoor/outdoor (the "What?" buttons)
         indoor_outdoor = request.GET.get('indoor_outdoor', '')
         if indoor_outdoor:
-         venues = venues.filter(indoor_outdoor__iexact=indoor_outdoor)
+            venues = venues.filter(indoor_outdoor__iexact=indoor_outdoor)
 
          # Filter by age (the "Who" field — kid's age)
         age = request.GET.get('age', '')
         if age:
         # min_age <= age <= max_age
-         venues = venues.filter(min_age__lte=age, max_age__gte=age)
+            venues = venues.filter(min_age__lte=age, max_age__gte=age)
         
-        # Serializer turns the venue objects into JSON the frontend can use
+        # If a suburb was searched but no venues came back, work out WHY so the frontend can show a friendly message instead of an empty list.
+        # This block returns a special response shape with a status field, only on the "no venues found" cases.
+        # The successful path below still returns a flat array, so existing frontend code keeps working.
+        if suburb and not venues.exists():
+            # Try NSW first - the autocomplete only shows NSW suburbs, an NSW match is what the user almost certainly meant.
+            # This matters for suburb names that exist in multiple states (e.g. Newtown is in NSW, VIC, and QLD).
+            suburb_record = Suburb.objects.filter(
+                suburb__iexact=suburb,
+                state='NSW'
+            ).first()
+
+            # If no NSW match, fall back to any state — this catches users who somehow searched for a non-NSW suburb (e.g. typed it in the URL).
+            if not suburb_record:
+                suburb_record = Suburb.objects.filter(suburb__iexact=suburb).first()
+
+            if not suburb_record:
+                # The suburb name isn't in our Suburb table at all (typo or made-up name like "Hogsmeade")
+                return Response({
+                    'status': 'unknown_suburb',
+                    'suburb': suburb,
+                    'venues': [],
+                })
+
+            if suburb_record.state != 'NSW':
+                # Suburb exists but isn't in NSW (e.g. Melbourne in VIC), frontend will show: "We're only built for NSW..."
+                return Response({
+                    'status': 'unsupported_state',
+                    'suburb': suburb_record.suburb,
+                    'state': suburb_record.state,
+                    'venues': [],
+                })
+
+            # Suburb is in NSW but no venues match the current filters., frontend will show: "Nothing logged in {suburb} yet..."
+            return Response({
+                'status': 'no_venues_in_nsw_suburb',
+                'suburb': suburb_record.suburb,
+                'state': 'NSW',
+                'venues': [],
+            })
+
+        # Normal case — venues found (or no suburb filter at all).
+        # Serializer turns the venue objects into JSON the frontend can use.
+        # Returns a flat array, unchanged from the original behaviour.
         serializer = VenueSerializer(venues, many=True)
         return Response(serializer.data)
     
