@@ -13,7 +13,7 @@ def search(request):
         # database query
         # suburb__istartswith=search — the double underscore is Django's syntax for "field lookups"
         # [:5] take only the first 5 results and limits the dropdown
-        objs = Suburb.objects.filter(suburb__istartswith=search, state='NSW')[:5]
+        objs = Suburb.objects.filter(suburb__istartswith=search, state='NSW')[:5] 
         # loop through each suburb
         for obj in objs:
             # payload is the list we created at the top
