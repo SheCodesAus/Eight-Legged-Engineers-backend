@@ -6,4 +6,6 @@ urlpatterns = [
     path('venues/<int:pk>/', views.VenueDetail.as_view()),
     path('venues/<int:venue_pk>/ratings/', views.RatingList.as_view()),
     path('venues/<int:venue_pk>/ratings/<int:pk>/', views.RatingDetail.as_view()),
+    path('saved/', views.SavedVenueList.as_view()),
+    path('saved/<int:venue_pk>/', views.SavedVenueDetail.as_view()),
 ]

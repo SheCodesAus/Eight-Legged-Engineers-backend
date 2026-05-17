@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Venue, Rating
+from .models import Venue, Rating, SavedVenue
 
 class RatingSerializer(serializers.ModelSerializer):
 
@@ -21,7 +21,7 @@ class VenueDetailSerializer(VenueSerializer):
 
     class Meta(VenueSerializer.Meta):
         fields = '__all__'
-        
+
     def update(self, instance, validated_data):
         instance.main_category = validated_data.get('main_category', instance.main_category)
         instance.sub_category = validated_data.get('sub_category', instance.sub_category)
@@ -42,3 +42,16 @@ class VenueDetailSerializer(VenueSerializer):
         instance.save()
         return instance
 
+
+class SavedVenueSerializer(serializers.ModelSerializer):
+    venue = VenueSerializer(read_only=True)
+    venue_id = serializers.PrimaryKeyRelatedField(
+        queryset=Venue.objects.filter(is_archived=False, is_published=True),
+        write_only=True,
+        source='venue'
+    )
+
+    class Meta:
+        model = SavedVenue
+        fields = ['id', 'venue', 'venue_id', 'created_at']
+        read_only_fields = ['id', 'created_at']

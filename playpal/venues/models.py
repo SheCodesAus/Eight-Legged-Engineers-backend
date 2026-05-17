@@ -6,7 +6,7 @@ class Venue(models.Model):
         ('Activity', 'Activity'),
         ('Eatery', 'Places to Eat'),
     ]
-    
+
     main_category = models.CharField(max_length=20, choices=MAIN_CATEGORY_CHOICES)
     sub_category = models.CharField(max_length=50)
     name = models.CharField(max_length=255, blank=True)
@@ -22,7 +22,7 @@ class Venue(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     image_url = models.URLField(max_length=500, blank=True)
-    
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -30,25 +30,26 @@ class Venue(models.Model):
         blank=True,
         related_name='submitted_venues'
     )
-    
+
     is_published = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
     ratings_id = models.IntegerField(null=True, blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         indexes = [
             models.Index(fields=['main_category', 'sub_category']),
             models.Index(fields=['suburb']),
             models.Index(fields=['is_published']),
         ]
-    
-    # when a venue is soft deleted, the corresponding ratings are also soft deleted.
+
+    # when a venue is soft deleted, the corresponding ratings and saved entries are also soft deleted.
     def save(self, *args, **kwargs):
         if self.is_archived:
             self.ratings.update(is_archived=True)
+            self.saved_by.update(is_archived=True)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -79,3 +80,24 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"{self.user} rated {self.venue} - {self.rating_type}"
+
+
+class SavedVenue(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='saved_venues'
+    )
+    venue = models.ForeignKey(
+        Venue,
+        on_delete=models.CASCADE,
+        related_name='saved_by'
+    )
+    is_archived = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'venue')
+
+    def __str__(self):
+        return f"{self.user} saved {self.venue}"
