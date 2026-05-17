@@ -113,7 +113,7 @@ class VenueDetail(APIView):
     
     def get(self, request, pk):
         # pk = primary key (the venue's ID)
-        venue = get_object_or_404(Venue, pk=pk)
+        venue = get_object_or_404(Venue, pk=pk, is_archived=False)
         serializer = VenueDetailSerializer(venue)
         return Response(serializer.data)
     
@@ -131,12 +131,18 @@ class VenueDetail(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        
+
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+
+    def delete(self, request, pk):
+        venue = get_object_or_404(Venue, pk=pk, is_archived=False)
+        venue.is_archived = True
+        venue.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class RatingList(APIView):
     # GET /api/venues/<venue_pk>/ratings/ — list all ratings for a venue
     # POST /api/venues/<venue_pk>/ratings/ — create a rating for a venue
