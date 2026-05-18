@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from .models import CustomUser, Kids
 
 
@@ -7,6 +8,13 @@ class KidsSerializer(serializers.ModelSerializer):
         model = Kids
         fields = ['id', 'birth_month', 'birth_year', 'user']
         read_only_fields = ['user']
+
+    ## Ensure that kid's maximum age is 12 at any given time.
+    def validate_birth_year(self, value):
+        min_year = timezone.now().year - 12
+        if value < min_year:
+            raise serializers.ValidationError(f"Birth year must be {min_year} or later.")
+        return value
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
